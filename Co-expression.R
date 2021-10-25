@@ -524,7 +524,7 @@ if(T){
   set.seed(10);
   select = sample(nGenes, size = nSelect);
   selectTOM = dissTOM[select, select];
-  # There¡¯s no simple way of restricting a clustering tree to a subset of genes, so we must re-cluster.
+  # Thereâ€™s no simple way of restricting a clustering tree to a subset of genes, so we must re-cluster.
   selectTree = hclust(as.dist(selectTOM), method = "average")
   selectColors = moduleColors[select];
   # Open a graphical window
@@ -543,8 +543,8 @@ if(T){
   #### relations btw modules and stroke
   # Recalculate module eigengenes
   MEs = moduleEigengenes(datExpr, moduleColors)$eigengenes
-  ## Ö»ÓÐÁ¬ÐøÐÍÐÔ×´²ÅÄÜÖ»ÓÐ¼ÆËã
-  ## ÕâÀï°ÑÊÇ·ñÊô Luminal ±íÐÍÕâ¸ö±äÁ¿0,1½øÐÐÊýÖµ»¯
+  ## åªæœ‰è¿žç»­åž‹æ€§çŠ¶æ‰èƒ½åªæœ‰è®¡ç®—
+  ## è¿™é‡ŒæŠŠæ˜¯å¦å±ž Luminal è¡¨åž‹è¿™ä¸ªå˜é‡0,1è¿›è¡Œæ•°å€¼åŒ–
   Stroke = as.data.frame(design[,1]);
   names(Stroke) = "Stroke"
   # Add the weight to existing module eigengenes
@@ -564,14 +564,14 @@ if(T){
   # # Plot the dendrogram
   # sizeGrWindow(8,10);
   # par(cex = 1.0)
-  # ## Ä£¿éµÄ½ø»¯Ê÷
+  # ## æ¨¡å—çš„è¿›åŒ–æ ‘
   # # png("step7-Eigengene-dendrogram-hclust.png",width = 800,height = 600)
   # plotEigengeneNetworks(MET, "Eigengene dendrogram", marDendro = c(0,4,2,0),
   #                       plotHeatmaps = FALSE)
   # # dev.off()
   # # Plot the heatmap matrix (note: this plot will overwrite the dendrogram plot)
   # par(cex = 1.0)
-  # ## ÐÔ×´ÓëÄ£¿éÈÈ
+  # ## æ€§çŠ¶ä¸Žæ¨¡å—çƒ­
   # 
   # # png("step7-Eigengene-adjacency-heatmap.png",width = 800,height = 600)
   # plotEigengeneNetworks(MET, "Eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
@@ -589,17 +589,17 @@ if(T){
 
 
 ## step 8 
-# Ö÷ÒªÊÇ¹ØÐÄ¾ßÌåÄ³¸öÄ£¿éÄÚ²¿µÄ»ùÒò
+# ä¸»è¦æ˜¯å…³å¿ƒå…·ä½“æŸä¸ªæ¨¡å—å†…éƒ¨çš„åŸºå› 
 if(T){
   # Select module
   module = "yellow";
   # Select module probes
-  probes = colnames(datExpr) ## ÎÒÃÇÀý×ÓÀïÃæµÄprobe¾ÍÊÇ»ùÒò
+  probes = colnames(datExpr) ## æˆ‘ä»¬ä¾‹å­é‡Œé¢çš„probeå°±æ˜¯åŸºå› 
   inModule = (moduleColors==module);
   modProbes = probes[inModule]; 
   head(modProbes)
   
-  # Èç¹ûÊ¹ÓÃWGCNA°ü×Ô´øµÄÈÈÍ¼¾ÍºÜ³ó¡£
+  # å¦‚æžœä½¿ç”¨WGCNAåŒ…è‡ªå¸¦çš„çƒ­å›¾å°±å¾ˆä¸‘ã€‚
   which.module="yellow";
   dat=datExpr[,moduleColors==which.module ] 
   plotMat(t(scale(dat)),nrgcols=30,rlabels=T,
@@ -608,8 +608,8 @@ if(T){
   datExpr[1:4,1:4]
   dat=t(datExpr[,moduleColors==which.module ] )
   library(pheatmap)
-  pheatmap(dat ,show_colnames =F,show_rownames = F) #¶ÔÄÇÐ©ÌáÈ¡³öÀ´µÄ1000¸ö»ùÒòËùÔÚµÄÃ¿Ò»ÐÐÈ¡³ö£¬×éºÏÆðÀ´ÎªÒ»¸öÐÂµÄ±í´ï¾ØÕó
-  n=t(scale(t(log(dat+1)))) # 'scale'¿ÉÒÔ¶Ôlog-ratioÊýÖµ½øÐÐ¹éÒ»»¯
+  pheatmap(dat ,show_colnames =F,show_rownames = F) #å¯¹é‚£äº›æå–å‡ºæ¥çš„1000ä¸ªåŸºå› æ‰€åœ¨çš„æ¯ä¸€è¡Œå–å‡ºï¼Œç»„åˆèµ·æ¥ä¸ºä¸€ä¸ªæ–°çš„è¡¨è¾¾çŸ©é˜µ
+  n=t(scale(t(log(dat+1)))) # 'scale'å¯ä»¥å¯¹log-ratioæ•°å€¼è¿›è¡Œå½’ä¸€åŒ–
   n[n>2]=2 
   n[n< -2]= -2
   n[1:4,1:4]
@@ -619,8 +619,8 @@ if(T){
   rownames(ac)=colnames(n) 
   pheatmap(n,show_colnames =F,show_rownames = F,
            annotation_col=ac )
-  # ¿ÉÒÔºÜÇåÎúµÄ¿´µ½£¬ËùÓÐµÄÐÎ×´Ïà¹ØµÄÄ£¿é»ùÒò
-  # ÆäÊµÎ´±Ø¾Í²»ÊÇ²îÒì±í´ï»ùÒò¡£
+  # å¯ä»¥å¾ˆæ¸…æ™°çš„çœ‹åˆ°ï¼Œæ‰€æœ‰çš„å½¢çŠ¶ç›¸å…³çš„æ¨¡å—åŸºå› 
+  # å…¶å®žæœªå¿…å°±ä¸æ˜¯å·®å¼‚è¡¨è¾¾åŸºå› ã€‚
 }
 
 
@@ -634,14 +634,14 @@ if(T){
   # Select module
   module = "yellow";
   # Select module probes
-  probes = colnames(datExpr) ## ÎÒÃÇÀý×ÓÀïÃæµÄprobe¾ÍÊÇ»ùÒò
+  probes = colnames(datExpr) ## æˆ‘ä»¬ä¾‹å­é‡Œé¢çš„probeå°±æ˜¯åŸºå› 
   inModule = (moduleColors==module);
   modProbes = probes[inModule]; 
-  ## Ò²ÊÇÌáÈ¡Ö¸¶¨Ä£¿éµÄ»ùÒòÃû
+  ## ä¹Ÿæ˜¯æå–æŒ‡å®šæ¨¡å—çš„åŸºå› å
   # Select the corresponding Topological Overlap
   modTOM = TOM[inModule, inModule];
   dimnames(modTOM) = list(modProbes, modProbes)
-  ## Ä£¿é¶ÔÓ¦µÄ»ùÒò¹ØÏµ¾Ø
+  ## æ¨¡å—å¯¹åº”çš„åŸºå› å…³ç³»çŸ©
   cyt = exportNetworkToCytoscape(
     modTOM,
     edgeFile = paste("CytoscapeInput-edges-", paste(module, collapse="-"), ".txt", sep=""),
