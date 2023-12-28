@@ -4,11 +4,6 @@ setwd('H:\\Users\\yrt05\\Desktop\\Systems biology project\\R script\\test')  # \
 #download data from GEO database, get file ".csv"
 #function source: https://github.com/jmzeng1314/humanid/blob/master/R/downGSE.R
 
-# if (!require("BiocManager", quietly = TRUE))
-#   install.packages("BiocManager")
-# 
-# BiocManager::install("GEOquery")
-
 if(T){
   downGSE <- function(studyID = "GSE137482", destdir = ".") {
     library(GEOquery)
@@ -26,13 +21,9 @@ if(T){
   
   }
 
-# getGEOSuppFiles('GSE137482')
-
-# myColData <- phenoData(eSet) 
-
-clindata <- eSet[["GSE137482_series_matrix.txt.gz"]]@phenoData@data
-
-head(clindata)
+# clindata <- eSet[["GSE137482_series_matrix.txt.gz"]]@phenoData@data
+# 
+# head(clindata)
 
 # BiocManager::install("GEOquery")
 library(GEOquery)
@@ -58,14 +49,9 @@ pdata = pData(eSet[[1]])
 ### Normalization
 
 setwd("H:\\Users\\yrt05\\Desktop\\Systems biology project\\GSE137482_RAW")
-# install.packages("BiocManager")
-# BiocManager::install("affy")
+
 library(affy)
-# mydata_GSE35338<-ReadAffy()
-# data <- exprs(mydata_GSE35338[,c(1:9,19:21,25:27,22:24,28:30)][1])
 
-
-setwd("H:\\Users\\yrt05\\Desktop\\Systems biology project\\GSE137482_RAW\\")
 files <- list.files(pattern=".count.txt.gz")
 ## read data using loop
 raw_counts <- read.delim(files[1], stringsAsFactors=FALSE, header = FALSE)
@@ -128,20 +114,6 @@ DEG_voom = na.omit(tempOutput)
 head(DEG_voom)
 
 rownames(DEG_voom) <- gsub("\\..*","", str_trim(rownames(DEG_voom)))
-
-
-### MAS5 normalization
-# mydata_GSE35338_mas5<-mas5(mydata_GSE35338)
-# # GC-RMA normalization
-# biocLite("gcrma")
-# mydata_GSE4536_gcrma<-gcrma(mydata_GSE4536)
-
-### Farms normalization
-# biocLite("farms")
-# library(farms)
-# mydata_GSE4536_farms<-qFarms(mydata_GSE4536)
-# # dchip normalization
-# mydata_GSE4536_dchip<-expresso(mydata_GSE4536,normalize.method="invariantset",bg.correct=FASE,pmcorrect.method="pmonly",summary.method="liwong")
 
 
 # load('exprSet_mydata_GSE35338_rma.Rdata')
@@ -211,13 +183,19 @@ library(stringi)
 DEG_up = rownames(find_DEG_up)
 DEG_down = rownames(find_DEG_down)
 DEG_total = c(DEG_up,DEG_down)
+
+length(DEG_up)
+length(DEG_down)
+
 length(DEG_total)
 DEG_total_11_30 <- DEG_total
 
+# write(DEG_total_11_30,"DEG_total_11_30.txt",sep = '')
 
-setwd("C:/Users/yrt05/Desktop/Systems biology project/GSE35338_RAW")
-commen_gene <- read.delim("DEG_total.txt", header=FALSE)
-DEG_two_data_common <- intersect(DEG_total_11_30, commen_gene$V1) ### Common DEGs from two data sets
+
+setwd("H:\\Users\\yrt05\\Desktop\\Systems biology project\\GSE137482_RAW")
+# commen_gene <- read.delim("DEG_total.txt", header=FALSE)
+# DEG_two_data_common <- intersect(DEG_total_11_30, commen_gene$V1) ### Common DEGs from two data sets
 
 # write(DEG_total,"DEG_new.txt",sep = '')  # save TXT data
 
@@ -225,17 +203,14 @@ DEG_two_data_common <- intersect(DEG_total_11_30, commen_gene$V1) ### Common DEG
 
 
 ############################ Last step: overlap btw DEG and co-expression
-setwd("C:/Users/yrt05/Desktop/Systems biology project/GSE137482_RAW")
+
+
 load('selected_genes_name_WGCNA_1130.Rdata')
-# # together_up <- c(selected_genes_name,DEG_up)
-# together_up <- c(selected_genes_name,DEG_up)
-# together_down <- c(selected_genes_name,DEG_down)
-# together_total <- c(selected_genes_name,DEG_up,DEG_down)
 
 DEG_WGCNA_common <- intersect(selected_genes_name, DEG_total_11_30)
-write(DEG_WGCNA_common,"DEG_WGCNA_common_11_30.txt",sep = '')
+# write(DEG_WGCNA_common,"DEG_WGCNA_common_11_30.txt",sep = '')
 
-# 
+
 library(VennDiagram)
 # write(together_total,"Two_method_together_11_30.txt",sep = '')  # save TXT data
 
@@ -246,7 +221,9 @@ venn.diagram(
   # output=TRUE
 )
 
-intersect(DEG_two_data_common, DEG_WGCNA_common)
+# intersect(DEG_two_data_common, DEG_WGCNA_common)
+
+
 
 
 
@@ -297,14 +274,18 @@ head(gene_getname.df)
 # install.packages("R.utils")
 R.utils::setOption("clusterProfiler.download.method","auto")
 # options(clusterProfiler.download.method = "wget")
-R.utils::setOption("clusterProfiler.download.method","wget")
+# R.utils::setOption("clusterProfiler.download.method","wget")
 kk <- enrichKEGG(gene = gene_getname.df$ENTREZID,
-                 organism = "hsa",
+                 organism = "mmu",
                  qvalueCutoff = 0.05)
+
+
+
 
 
 font_size = 11
 library(scales) 
+library(ggplot2)
 head(kk@result)
 kk@result[["Description"]][1:3]
 kegg <- kk
@@ -340,7 +321,7 @@ p2 <- p2 + theme(legend.position="right",
                  legend.justification = c("right", "top"),
                  # legend.margin = margin(6, 6, 6, 6)
                  )
-
+library(cowplot)
 plot_grid(p2, p1, labels = c("a","b"), label_size = 15,  nrow = 2, align = c("h"))
 
 
@@ -392,6 +373,7 @@ P_down <- dat[rownames(dat) %in% down_DEG$SYMBOL,4]
 # GO_result$
 
 ### GO enrichment 2
+
 library(clusterProfiler)
 # de <- c(up_DEG$ENTREZID, down_DEG$ENTREZID)
 de <- bitr(rownames(nrDEG), fromType = "SYMBOL",
@@ -399,83 +381,105 @@ de <- bitr(rownames(nrDEG), fromType = "SYMBOL",
                        OrgDb = "mouse430a2.db")
 de <- de$ENTREZID
 go <- enrichGO(de, OrgDb = "org.Mm.eg.db", ont="all")
+
 # ego <- enrichGO(de, OrgDb = "org.Mm.eg.db", ont="BP", readable=TRUE)
 # go <- enrichDAVID(de, idType="ENTREZ_GENE_ID",  listType="Gene", annotation="KEGG_PATHWAY")
+
 library(ggplot2)
 
 
 library(GOplot)
 data(EC)
 test <- EC$david
-setwd("C:/Users/yrt05/Desktop/Systems biology project/GSE137482_RAW")
-readfile <- read.csv("gProfiler_mmusculus.csv")        ### web data through https://biit.cs.ut.ee/gprofiler/gost
+
+# readfile <- read.csv("gProfiler_mmusculus.csv")        ### web data through https://biit.cs.ut.ee/gprofiler/gost
+
+readfile <- read.csv("gProfiler_mmusculus_12_24.csv")        ### web data through https://biit.cs.ut.ee/gprofiler/gost
+
+
+colnames(readfile)
+
+
 readfile <- subset(readfile, select = c("source","term_name", "intersections", "adjusted_p_value", "term_id") )
+
+
 colnames(readfile)[1:4] <-colnames(test)[c(1,3,4,5)]
 readfile <- readfile[, c(1,5,2,3,4)]
 colnames(readfile)[2] <-colnames(test)[2]
+# colnames(readfile)[4] <- 'Genes'
+
 test3 <- as.factor(readfile$Genes)
-length(test3)
+length(test3) # number of GO terms  2291 
 test3 <- str_split(test3, ",")
 # unlist(test3)
 library("org.Mm.eg.db")
 nrDEG_data <- cbind(rownames(nrDEG), nrDEG)
 colnames(nrDEG_data) <- c("ID", colnames(nrDEG))
+
 readfile$Category <- gsub("GO:","", str_trim(readfile$Category))
+
 rownames(nrDEG_data) <- c(1:nrow(nrDEG_data))
 
+
+hub_gene_name <- c('Actb', 'Itgb1', 'Stat3', 'Fn1', 'Pecam1', 'Kdr', 'Csf1r')
+hub_nrDEG_data <- nrDEG_data %>% filter(ID %in% hub_gene_name)
+
 # length(test3)
-for (i in 1:length(test3)){
-  map <- mapIds(org.Mm.eg.db, keys = unlist(str_split(unlist(test3[i]),",")) , keytype = "ENSEMBL", column = "SYMBOL", multiVals="first")
-  # map <- mapIds(org.Mm.eg.db, keys = map , keytype = "SYMBOL", column = "PROBEID", multiVals="list")
-  result <- data.frame(paste(toupper(map), collapse=', '))
-  readfile$Genes[i] <- result
-  # print(as.factor(paste(toupper(map), collapse=', ')))
-}
+
+### length is the gene numbers in "readfile$Genes"
+# for (i in 1:length(test3)){
+# for (i in 1:100){
+#   map <- mapIds(org.Mm.eg.db, keys = unlist(str_split(unlist(test3[i]),",")) , keytype = "ENSEMBL", column = "SYMBOL", multiVals="first")
+#   # map <- mapIds(org.Mm.eg.db, keys = unlist(str_split(unlist(test3[i]),",")) , keytype = "SYMBOL" , column = "ENSEMBL", multiVals="first")
+#   # test <- as_tibble(map)
+#   # map <- mapIds(org.Mm.eg.db, keys = map , keytype = "SYMBOL", column = "PROBEID", multiVals="list")
+#   result <- data.frame(paste(toupper(map), collapse=', '))
+#   # readfile$Genes[i] <- result[[1]]
+#   readfile$Genes[i] <- result[[1]]
+#   
+#   # readfile$Genes[2]
+#   # readfile$Genes[5]
+#   # print(as.factor(paste(toupper(map), collapse=', ')))
+# }
 
 readfile <- filter(readfile, Category %in% c("CC", "BP", "MF"))
 
-circ <- circle_dat(readfile, nrDEG_data)
 
+head(readfile)
 
-# GOBubble(circ, labels = 10)
-# Reduce redundant terms with a gene overlap >= 0.75...
-# reduced_circ <- reduce_overlap(circ, overlap = 0.75)
-# # ...and plot it
-# GOBubble(reduced_circ, labels = 2.8)
+readfile$Genes[666]
 
-# GOBubble(circ, title = 'Bubble plot', colour = c('orange', 'darkred', 'gold'), display = 'multiple', labels = 10)  
-
-# GOBar(subset(circ, category == 'BP'))
-
-
-
-
+circ <- circle_dat(readfile, nrDEG_data) ## 2200 GO terms,  1500 DEGs
+# circ <- circle_dat(nrDEG_data, readfile) ## 2200 GO terms,  1500 DEGs
+head(circ)
 
 
 
 ### GO plot
-
-
-
-go2 <- dotplot(go, showCategory=5, split="ONTOLOGY") + facet_grid(ONTOLOGY~., scale="free")
+go2 <- dotplot(go, showCategory=6, split="ONTOLOGY") + facet_grid(ONTOLOGY~., scale="free") + scale_y_discrete(labels=function(x) str_wrap(x, width=40)) ### go == go2
 
 ### Separate analyses
 go_result <- summary(go)
-go_result_All <- go_result$ID[order(go_result$Count, decreasing=T)]
+test <- as.data.frame(go)
+# test = go_result
+
+go_result$Count
+go_result_All <- go_result$ID[order(go_result$Count, decreasing=T)]  ### GeneRatio == Count
 # head(go_result_All)
-go_result_All[1:5]
-IDs <- c(go_result_All[1:5])
+
+
+go_result_All[1:5]  ### go  "enrichGO"
+
+IDs <- c(go_result_All[1:6])
+
+# GOCircle(circ)
+
+test <- circ[, -1]
+
 
 go1 <- GOCircle(circ, nsub = IDs,  rad1 = 2, rad2 = 3,  zsc.col = c('yellow', 'black', 'cyan'))
 
-# go_result_BP <- filter(go_result, ONTOLOGY %in% c("BP"))
-# go_result_BP <- go_result_BP$ID[order(go_result_BP$Count, decreasing=T)]
-# go_result_MF <- filter(go_result, ONTOLOGY %in% c("MF"))
-# go_result_MF <- go_result_MF$ID[order(go_result_MF$Count, decreasing=T)]
-# go_result_CC <- filter(go_result, ONTOLOGY %in% c("CC"))
-# go_result_CC <- go_result_CC$ID[order(go_result_CC$Count, decreasing=T)]
-
-
+font_size = 11
 go2 <- go2 + theme(legend.position="right",
                  legend.text = element_text(size = font_size),
                  # legend.background = element_rect(fill="lightblue", size = 1),
@@ -483,16 +487,19 @@ go2 <- go2 + theme(legend.position="right",
                  legend.justification = c("right", "top"),
                  # legend.margin = margin(6, 6, 6, 6)
 )
+
+
+
 # plot(go2)
 library(cowplot)
-# ,   rel_heights = c(0.3, 1.2)
-# par(mfrow=c(1,2))
-# dotplot(go, showCategory=5, split="ONTOLOGY") + facet_grid(ONTOLOGY~., scale="free")
-# GOCircle(circ, nsub = IDs, label.size = 6, rad1 = 3, rad2 = 4,  zsc.col = c('yellow', 'black', 'cyan'))
-
-plot_grid(go2, go1, labels = c("a","b"), label_size = 22, ncol = 2, align = c("h"), greedy = TRUE, 
-          rel_widths = c(1, 1.5),
+label_size <- grid::unit(22, "pt")
+plot_grid(go2, go1, labels = c("a","b"), label_size = 20, ncol = 2, align = c("h"), greedy = TRUE, 
+          rel_widths = c(1.1, 1.2),
           axis = "b", scale = c(1,1), cex= 2)
+
+
+
+
 
 
 
@@ -536,7 +543,7 @@ get.ppiNCBI <- function(g.n) {
 
 ppi <- get.ppiNCBI(genes)
 # install.packages("remotes")
-remotes::install_github("moosa-r/rbioapi")
+# remotes::install_github("moosa-r/rbioapi")
 
 library(rbioapi)
 proteins_mapped <- rba_string_map_ids(ids = genes,
@@ -553,12 +560,14 @@ graph_1 <- rba_string_network_image(ids = proteins_mapped$stringId,
 
 
 ### Read hub from DEG
+
 # C:/Users/yrt05/Desktop/Systems biology project/GSE137482_RAW
 DEG_sting <- read.csv("DEG_string.csv")
 DEG_sting <- DEG_sting[, c("shared.name", "Degree", "Stress", "BetweennessCentrality")]
 rownames(DEG_sting) <- DEG_sting$shared.name
 
 percent <- 0.1
+
 DEG_Stress <- rownames(DEG_sting[order(DEG_sting$Stress, decreasing = TRUE), ])[1:round(percent*(dim(DEG_sting)[1]))]
 str_sort(DEG_Stress)
 
@@ -569,14 +578,18 @@ DEG_Degree <- rownames(DEG_sting[order(DEG_sting$Degree, decreasing = TRUE), ])[
 
 library("ggvenn")
 
-B <-list('Stress'=DEG_Stress, 'Betweenness'=DEG_Betweenness, 'Degree' = DEG_Degree)
-ggvenn(B,show_percentage=FALSE, stroke_size = 0.5, set_name_size = 8,
-       text_color = "black",
-       text_size = 8
-       )
+# B <-list('Stress'=DEG_Stress, 'Betweenness'=DEG_Betweenness, 'Degree' = DEG_Degree)
+# ggvenn(B,show_percentage=FALSE, stroke_size = 0.5, set_name_size = 8,
+#        text_color = "black",
+#        text_size = 8
+#        )
 
 
 DEG_hub <- intersect(intersect(DEG_Stress, DEG_Betweenness), DEG_Degree)
+
+DEG_hub
+
+# write(DEG_hub,"DEG_hubs_12_25.txt",sep = '')  # save TXT data
 
 hub_two_method <- intersect(DEG_hub, rownames(first_ten_record_yellow))
 
